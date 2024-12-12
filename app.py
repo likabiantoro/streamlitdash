@@ -14,7 +14,7 @@ with st.form('my_form'):
     minuman_val = st.selectbox('Pilih minuman', ['Es Teh', 'Es Jeruk', 'Air Putih', 'Kopi', 'Jus Mangga'])
     porsi_val = st.select_slider('Ukuran porsi', ['Kecil', 'Sedang', 'Besar'])
     pedas_val = st.select_slider('Tingkat kepedasan', ['Tidak Pedas', 'Sedikit Pedas', 'Pedas', 'Sangat Pedas'])
-    nasi_val = st.checkbox('Nasi Putih')
+    nasi_val = st.checkbox('Telur', 'Sambal')
 
     # Setiap form harus memiliki tombol kirim
     submitted = st.form_submit_button('Kirim')
