@@ -1,47 +1,68 @@
 import streamlit as st
 import pandas as pd
-import statsmodels.api as sm
-import seaborn as sns
+import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
+from statsmodels.tsa.arima.model import ARIMA
+from sklearn.metrics import mean_squared_error
 
-# Judul dashboar
-st.title('Dashboard Regresi Linier Berganda')
+# Set title for the app
+st.title('Dashboard Analisis Time Series dengan ARIMA')
 
-# Step 1: Upload file CSV
+# Step 1: Upload CSV file
 st.header('1. Upload Data CSV')
 uploaded_file = st.file_uploader("Pilih file CSV", type="csv")
 
 if uploaded_file is not None:
-    # Step 2: Tabel Data
+    # Step 2: Read the CSV and display it
     df = pd.read_csv(uploaded_file)
+
+    # Step 3: Display the first few rows and column names
     st.subheader('Tabel Data')
-    st.dataframe(df)
+    st.dataframe(df.head())
 
-    # Step 3: Cek apakah data Y dan X tersedia
-    if 'Y' in df.columns:
-        # Identifikasi variabel Y (respon) dan X (prediktor)
-        X_columns = [col for col in df.columns if col != 'Y']
-        X = df[X_columns]
-        Y = df['Y']
-        X = sm.add_constant(X)
+    # Step 4: Kolom waktu harus diubah menjadi datetime
+    # Pastikan file CSV memiliki kolom dengan format waktu
+    if 'Date' in df.columns:
+        df['Date'] = pd.to_datetime(df['Date'])
 
-        # Step 4: Fit model regresi
-        model = sm.OLS(Y, X).fit()
+        # Pilih kolom waktu dan nilai (misal: kolom 'Date' dan 'Value')
+        st.subheader('Visualisasi Data Time Series')
+        st.line_chart(df.set_index('Date')['Value'])
 
-        # Step 5: Hasil regresi
-        st.subheader('Hasil Regresi Linier Berganda')
-        st.write(model.summary())
+        # Step 5: Pilih parameter ARIMA (p, d, q)
+        st.header('2. Pilih Parameter ARIMA (p, d, q)')
+        p = st.slider("Pilih p (AR order)", 0, 5, 1)
+        d = st.slider("Pilih d (differencing order)", 0, 2, 1)
+        q = st.slider("Pilih q (MA order)", 0, 5, 1)
 
-        # Step 6: Prediksi dan visualisasi hasil regresi
-        predictions = model.predict(X)
+        # Step 6: Memisahkan data menjadi data pelatihan dan data pengujian
+        train_size = int(len(df) * 0.8)
+        train, test = df['Value'][:train_size], df['Value'][train_size:]
 
-        st.subheader('Visualisasi Regresi Linier')
+        # Step 7: Membuat model ARIMA dan melakukan prediksi
+        model = ARIMA(train, order=(p, d, q))
+        model_fit = model.fit()
+
+        # Prediksi pada data pengujian
+        predictions = model_fit.forecast(steps=len(test))
+
+        # Step 8: Visualisasi hasil prediksi dan data aktual
+        st.subheader('Hasil Prediksi ARIMA')
         fig, ax = plt.subplots(figsize=(10, 6))
-        sns.regplot(x=Y, y=predictions, ax=ax, scatter_kws={'s': 10}, line_kws={'color': 'red'})
-        ax.set_xlabel('Nilai Aktual Y')
-        ax.set_ylabel('Prediksi Y')
-        ax.set_title('Prediksi vs Nilai Aktual')
+        ax.plot(df['Date'][:train_size], train, label='Data Pelatihan')
+        ax.plot(df['Date'][train_size:], test, label='Data Pengujian', color='orange')
+        ax.plot(df['Date'][train_size:], predictions, label='Prediksi ARIMA', color='red')
+        ax.set_xlabel('Waktu')
+        ax.set_ylabel('Nilai')
+        ax.set_title(f'Prediksi ARIMA (p={p}, d={d}, q={q})')
+        ax.legend()
         st.pyplot(fig)
 
+        # Step 9: Menampilkan metrik evaluasi
+        mse = mean_squared_error(test, predictions)
+        st.subheader('Metrik Evaluasi')
+        st.write(f'Mean Squared Error (MSE): {mse}')
+
 else:
-    st.write("Silakan upload file CSV yang berisi data Y dan X1, X2, X3, ...")
+    st.write("Silakan upload file CSV yang berisi data time series dengan kolom 'Date' dan 'Value'.")
