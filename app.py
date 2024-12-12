@@ -20,17 +20,14 @@ if uploaded_file is not None:
     st.subheader('Tabel Data')
     st.dataframe(df.head())
 
-    # Cek jika ada nilai yang hilang dan mengisi dengan nilai rata-rata untuk kolom numerik
-    if df.isnull().sum().any():
-        st.warning("Terdapat nilai yang hilang dalam data.")
-        
-        # Isi nilai yang hilang untuk kolom numerik dengan rata-rata
-        for column in df.select_dtypes(include=['float64', 'int64']).columns:
-            df[column] = df[column].fillna(df[column].mean())
-        
-        # Isi nilai yang hilang untuk kolom non-numerik dengan mode
-        for column in df.select_dtypes(include=['object']).columns:
-            df[column] = df[column].fillna(df[column].mode()[0])
+    # Menghilangkan warning dan langsung mengisi nilai yang kosong dengan rata-rata
+    # Isi nilai yang hilang untuk kolom numerik dengan rata-rata
+    for column in df.select_dtypes(include=['float64', 'int64']).columns:
+        df[column] = df[column].fillna(df[column].mean())
+    
+    # Isi nilai yang hilang untuk kolom non-numerik dengan mode (opsional)
+    for column in df.select_dtypes(include=['object']).columns:
+        df[column] = df[column].fillna(df[column].mode()[0])
 
     # Pastikan kolom 'Species' adalah string atau kategori
     df['Species'] = df['Species'].astype(str).str.strip()  # Menghapus spasi pada string
