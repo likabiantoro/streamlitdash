@@ -30,15 +30,14 @@ if uploaded_file is not None:
     else:
         st.write("Tidak ada kolom numerik untuk ditampilkan pada boxplot.")
 
-    # Step 5: Create Bar Chart for categorical data (if any)
-    st.subheader('Bar Chart')
-    categorical_columns = df.select_dtypes(include=['object', 'category']).columns
-    if len(categorical_columns) > 0:
-        for column in categorical_columns:
-            fig, ax = plt.subplots(figsize=(8, 6))
-            sns.countplot(data=df, x=column, ax=ax)
-            st.pyplot(fig)
+    # Step 5: Create Line Chart for numerical data
+    st.subheader('Line Chart')
+    if len(numeric_columns) > 0:
+        # Untuk line chart, pastikan kita memilih dua kolom numerik sebagai sumbu x dan y
+        st.write("Menampilkan grafik garis untuk dua kolom numerik pertama.")
+        line_chart_data = df[numeric_columns[:2]]  # Mengambil dua kolom numerik pertama
+        st.line_chart(line_chart_data)
     else:
-        st.write("Tidak ada kolom kategorikal untuk ditampilkan pada bar chart.")
+        st.write("Tidak ada kolom numerik untuk ditampilkan pada line chart.")
 else:
     st.write("Silakan upload file CSV untuk analisis.")
