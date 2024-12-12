@@ -1,5 +1,5 @@
-streamlit==1.29.0 
-pandas 
-seaborn 
-matplotlib 
+streamlit==1.29.0
+pandas
+seaborn
+matplotlib
 statsmodels
