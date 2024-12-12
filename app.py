@@ -4,37 +4,35 @@ import statsmodels.api as sm
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# Set title for the app
+# Judul dashboar
 st.title('Dashboard Regresi Linier Berganda')
 
-# Step 1: Upload CSV file
+# Step 1: Upload file CSV
 st.header('1. Upload Data CSV')
 uploaded_file = st.file_uploader("Pilih file CSV", type="csv")
 
 if uploaded_file is not None:
-    # Step 2: Read and display the uploaded CSV
+    # Step 2: Tabel Data
     df = pd.read_csv(uploaded_file)
     st.subheader('Tabel Data')
     st.dataframe(df)
 
-    # Step 3: Check if Y and X variables are available
+    # Step 3: Cek apakah data Y dan X tersedia
     if 'Y' in df.columns:
-        # Identifikasi variabel Y (target) dan X (predictors)
+        # Identifikasi variabel Y (respon) dan X (prediktor)
         X_columns = [col for col in df.columns if col != 'Y']
         X = df[X_columns]
         Y = df['Y']
-        
-        # Step 4: Add constant to the X variables (for intercept in regression)
         X = sm.add_constant(X)
 
-        # Step 5: Fit the regression model
+        # Step 4: Fit model regresi
         model = sm.OLS(Y, X).fit()
 
-        # Step 6: Display regression results
+        # Step 5: Hasil regresi
         st.subheader('Hasil Regresi Linier Berganda')
         st.write(model.summary())
 
-        # Step 7: Prediksi dan visualisasi hasil regresi
+        # Step 6: Prediksi dan visualisasi hasil regresi
         predictions = model.predict(X)
 
         st.subheader('Visualisasi Regresi Linier')
