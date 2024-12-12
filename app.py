@@ -1,13 +1,13 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 import seaborn as sns
-from statsmodels.tsa.arima.model import ARIMA
-from sklearn.metrics import mean_squared_error
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
 # Set title for the app
-st.title('Dashboard Analisis Time Series dengan ARIMA')
+st.title('Dashboard Klasifikasi dengan Decision Tree')
 
 # Step 1: Upload CSV file
 st.header('1. Upload Data CSV')
@@ -21,58 +21,52 @@ if uploaded_file is not None:
     st.subheader('Tabel Data')
     st.dataframe(df.head())
 
-    # Step 4: Kolom waktu harus diubah menjadi datetime
-    if 'Date' in df.columns:
-        df['Date'] = pd.to_datetime(df['Date'], errors='coerce')  # Mengubah menjadi datetime
-        st.write("Data setelah konversi tanggal:", df.head())  # Debugging
+    # Step 4: Menampilkan informasi tentang data
+    st.subheader('Informasi Data')
+    st.write(df.info())
 
-        if df['Date'].isnull().any():
-            st.error("Terdapat nilai yang tidak valid pada kolom 'Date'.")
-        else:
-            # Pilih kolom waktu dan nilai (misal: kolom 'Date' dan 'Value')
-            if 'Value' in df.columns:
-                st.subheader('Visualisasi Data Time Series')
-                st.line_chart(df.set_index('Date')['Value'])
-            else:
-                st.error("Kolom 'Value' tidak ditemukan pada dataset.")
+    # Step 5: Menampilkan statistik deskriptif data
+    st.subheader('Statistik Deskriptif')
+    st.write(df.describe())
 
-            # Step 5: Pilih parameter ARIMA (p, d, q)
-            st.header('2. Pilih Parameter ARIMA (p, d, q)')
-            p = st.slider("Pilih p (AR order)", 0, 5, 1)
-            d = st.slider("Pilih d (differencing order)", 0, 2, 1)
-            q = st.slider("Pilih q (MA order)", 0, 5, 1)
+    # Step 6: Memilih fitur dan target untuk klasifikasi
+    st.header('2. Pilih Fitur dan Target')
+    target_column = st.selectbox('Pilih kolom target', df.columns)
+    feature_columns = st.multiselect('Pilih kolom fitur', df.columns, default=df.columns.tolist()[:-1])
 
-            # Step 6: Memisahkan data menjadi data pelatihan dan data pengujian
-            train_size = int(len(df) * 0.8)
-            train, test = df['Value'][:train_size], df['Value'][train_size:]
+    if target_column and feature_columns:
+        # Step 7: Memisahkan data menjadi fitur dan target
+        X = df[feature_columns]
+        y = df[target_column]
 
-            # Debugging data train dan test
-            st.write("Data Pelatihan:", train.head())
-            st.write("Data Pengujian:", test.head())
+        # Step 8: Membagi data menjadi data pelatihan dan data pengujian
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-            # Step 7: Membuat model ARIMA dan melakukan prediksi
-            model = ARIMA(train, order=(p, d, q))
-            model_fit = model.fit()
+        # Step 9: Membuat model Decision Tree
+        model = DecisionTreeClassifier(random_state=42)
+        model.fit(X_train, y_train)
 
-            # Prediksi pada data pengujian
-            predictions = model_fit.forecast(steps=len(test))
+        # Step 10: Prediksi dan evaluasi
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
 
-            # Step 8: Visualisasi hasil prediksi dan data aktual
-            st.subheader('Hasil Prediksi ARIMA')
-            fig, ax = plt.subplots(figsize=(10, 6))
-            ax.plot(df['Date'][:train_size], train, label='Data Pelatihan')
-            ax.plot(df['Date'][train_size:], test, label='Data Pengujian', color='orange')
-            ax.plot(df['Date'][train_size:], predictions, label='Prediksi ARIMA', color='red')
-            ax.set_xlabel('Waktu')
-            ax.set_ylabel('Nilai')
-            ax.set_title(f'Prediksi ARIMA (p={p}, d={d}, q={q})')
-            ax.legend()
-            st.pyplot(fig)
+        # Step 11: Menampilkan hasil evaluasi
+        st.subheader('Hasil Evaluasi Model')
+        st.write(f'Akurasi Model: {accuracy * 100:.2f}%')
 
-            # Step 9: Menampilkan metrik evaluasi
-            mse = mean_squared_error(test, predictions)
-            st.subheader('Metrik Evaluasi')
-            st.write(f'Mean Squared Error (MSE): {mse}')
+        # Menampilkan classification report
+        st.subheader('Classification Report')
+        st.text(classification_report(y_test, y_pred))
+
+        # Menampilkan confusion matrix
+        st.subheader('Confusion Matrix')
+        cm = confusion_matrix(y_test, y_pred)
+        fig, ax = plt.subplots(figsize=(6, 4))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=model.classes_, yticklabels=model.classes_)
+        ax.set_xlabel('Prediksi')
+        ax.set_ylabel('Aktual')
+        ax.set_title('Confusion Matrix')
+        st.pyplot(fig)
 
 else:
-    st.write("Silakan upload file CSV yang berisi data time series dengan kolom 'Date' dan 'Value'.")
+    st.write("Silakan upload file CSV yang berisi data untuk klasifikasi.")
