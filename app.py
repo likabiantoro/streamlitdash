@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.preprocessing import LabelEncoder
 
 # Set title for the app
@@ -52,9 +52,19 @@ if uploaded_file is not None:
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
 
+    # Confusion matrix untuk menghitung sensitivitas dan spesifisitas
+    cm = confusion_matrix(y_test, y_pred)
+    tn, fp, fn, tp = cm.ravel()  # tn: True Negative, fp: False Positive, fn: False Negative, tp: True Positive
+
+    # Menghitung sensitivitas (recall) dan spesifisitas
+    sensitivity = tp / (tp + fn)
+    specificity = tn / (tn + fp)
+
     # Step 9: Tampilkan hasil evaluasi
     st.subheader(f'Hasil Evaluasi Model')
     st.write(f'Akurasi model: {accuracy:.2f}')
+    st.write(f'Sensitivitas (Recall): {sensitivity:.2f}')
+    st.write(f'Spesifisitas: {specificity:.2f}')
     
     # Step 10: Visualisasi pohon keputusan (optional)
     from sklearn.tree import plot_tree
