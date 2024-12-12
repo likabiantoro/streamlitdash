@@ -3,7 +3,7 @@ import streamlit as st
 st.header('st.selectbox')
 
 option = st.selectbox(
-     'What is your favorite color?',
-     ('Blue', 'Red', 'Green'))
+     'Apa hewan peliharaan yang anda miliki?',
+     ('Kucing', 'Anjing', 'Kelinci, 'Ayam))
 
-st.write('Your favorite color is ', option)
+st.write('Hewan peliharaan yang saya miliki adalah ', option)
