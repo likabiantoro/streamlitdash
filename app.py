@@ -1,17 +1,17 @@
 import streamlit as st
 
-st.title('Tema Aplikasi Streamlit')
+st.title('Customizing the theme of Streamlit apps')
 
-st.write('Berikut isi dari file `.streamlit/config.toml`:')
+st.write('Contents of the `.streamlit/config.toml` file of this app')
 
 st.code("""
 [theme]
-primaryColor="#00008B"
-backgroundColor="#00008B"
-secondaryBackgroundColor="#2F4F4F"
-textColor="#FFFF00"
-font="sans serif"
+primaryColor="#F39C12"
+backgroundColor="#2E86C1"
+secondaryBackgroundColor="#AED6F1"
+textColor="#FFFFFF"
+font="monospace"
 """)
 
-number = st.sidebar.slider('Pilih angka:', 0, 10, 5)
-st.write('Angka yang dipilih adalah:', number)
+number = st.sidebar.slider('Select a number:', 0, 10, 5)
+st.write('Selected number from slider widget is:', number)
