@@ -32,38 +32,43 @@ if uploaded_file is not None:
         for column in df.select_dtypes(include=['object']).columns:
             df[column] = df[column].fillna(df[column].mode()[0])
 
-    # Step 4: Encode target kolom jika diperlukan (misalnya 'Species' adalah string)
-    if df['Species'].dtype == 'object':  # Asumsi target kolom bernama 'Species'
-        le = LabelEncoder()
-        df['Species'] = le.fit_transform(df['Species'])
-    
-    # Step 5: Pisahkan data menjadi fitur (X) dan target (y)
-    X = df.drop(columns=['Species'])  # Fitur (X)
-    y = df['Species']  # Target (y)
+    # Step 4: Pastikan kolom target ada, misalnya 'Species' adalah kolom target
+    target_column = 'Species'  # Sesuaikan dengan nama kolom target yang benar
+    if target_column not in df.columns:
+        st.error(f"Kolom target '{target_column}' tidak ditemukan dalam data.")
+    else:
+        # Step 5: Encode target kolom jika diperlukan (misalnya 'Species' adalah string)
+        if df[target_column].dtype == 'object':  # Asumsi target kolom bernama 'Species'
+            le = LabelEncoder()
+            df[target_column] = le.fit_transform(df[target_column])
 
-    # Step 6: Pisahkan data menjadi data pelatihan dan pengujian
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        # Step 6: Pisahkan data menjadi fitur (X) dan target (y)
+        X = df.drop(columns=[target_column])  # Fitur (X)
+        y = df[target_column]  # Target (y)
 
-    # Step 7: Inisialisasi dan latih model Decision Tree
-    model = DecisionTreeClassifier()
-    model.fit(X_train, y_train)
+        # Step 7: Pisahkan data menjadi data pelatihan dan pengujian
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    # Step 8: Prediksi dan evaluasi model
-    y_pred = model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
+        # Step 8: Inisialisasi dan latih model Decision Tree
+        model = DecisionTreeClassifier()
+        model.fit(X_train, y_train)
 
-    # Step 9: Tampilkan hasil evaluasi
-    st.subheader(f'Hasil Evaluasi Model')
-    st.write(f'Akurasi model: {accuracy:.2f}')
-    
-    # Step 10: Visualisasi pohon keputusan (optional)
-    from sklearn.tree import plot_tree
-    import matplotlib.pyplot as plt
+        # Step 9: Prediksi dan evaluasi model
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
 
-    st.subheader('Visualisasi Pohon Keputusan')
-    fig, ax = plt.subplots(figsize=(10, 8))
-    plot_tree(model, filled=True, feature_names=X.columns, class_names=le.classes_, ax=ax)
-    st.pyplot(fig)
+        # Step 10: Tampilkan hasil evaluasi
+        st.subheader(f'Hasil Evaluasi Model')
+        st.write(f'Akurasi model: {accuracy:.2f}')
+        
+        # Step 11: Visualisasi pohon keputusan (optional)
+        from sklearn.tree import plot_tree
+        import matplotlib.pyplot as plt
+
+        st.subheader('Visualisasi Pohon Keputusan')
+        fig, ax = plt.subplots(figsize=(10, 8))
+        plot_tree(model, filled=True, feature_names=X.columns, class_names=le.classes_, ax=ax)
+        st.pyplot(fig)
 
 else:
-    st.write("Silakan upload file CSV yang berisi data dengan kolom 'Species' sebagai target.")
+    st.write("Silakan upload file CSV yang berisi data dengan kolom target seperti 'Species'.")
