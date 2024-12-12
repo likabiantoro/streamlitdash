@@ -13,6 +13,9 @@ chart_data = pd.DataFrame(
 # Menampilkan Line Chart
 st.line_chart(chart_data)
 
+# Spacer untuk pemisahan visual
+st.write("---")
+
 # Header untuk Bar Chart
 st.header('Bar Chart')
 
