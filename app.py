@@ -1,12 +1,17 @@
 import streamlit as st
 
-st.header('st.latex')
+st.title('Tema Aplikasi Streamlit')
 
-st.subheader('Teorema Pythagoras')
-st.latex(r'c^2 = a^2 + b^2')
+st.write('Berikut isi dari file `.streamlit/config.toml`:')
 
-st.subheader('Rumus Relativitas Einstein')
-st.latex(r'E = mc^2')
+st.code("""
+[theme]
+primaryColor="#00008B"
+backgroundColor="#00008B"
+secondaryBackgroundColor="#1C1C1C"
+textColor="#FFFFFF"
+font="sans serif"
+""")
 
-st.subheader('Persamaan Gelombang')
-st.latex(r'v = \lambda f')
+number = st.sidebar.slider('Pilih angka:', 0, 10, 5)
+st.write('Angka yang dipilih adalah:', number)
