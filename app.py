@@ -1,18 +1,15 @@
 import streamlit as st
 
-st.header('st.checkbox')
+st.header('st.latex')
 
-st.write('Apa aktivitas yang Anda sukai?')
+st.subheader('Teorema Pythagoras')
+st.latex(r'c^2 = a^2 + b^2')
 
-membaca = st.checkbox('Membaca')
-bepergian = st.checkbox('Bepergian')
-bersepeda = st.checkbox('Bersepeda')
+st.subheader('Rumus Relativitas Einstein')
+st.latex(r'E = mc^2')
 
-if membaca:
-    st.write("Luar biasa! Membaca memperluas wawasan Anda 📚")
+st.subheader('Persamaan Maxwell (Divergensi Medan Listrik)')
+st.latex(r'\nabla \cdot \mathbf{E} = \frac{\rho}{\varepsilon_0}')
 
-if bepergian:
-    st.write("Hebat! Bepergian memperluas cakrawala Anda ✈️")
-
-if bersepeda:
-    st.write("Pilihan yang bagus! Bersepeda membuat Anda tetap sehat dan bugar 🚴")
+st.subheader('Persamaan Maxwell (Divergensi Medan Magnet)')
+st.latex(r'\nabla \cdot \mathbf{B} = 0')
