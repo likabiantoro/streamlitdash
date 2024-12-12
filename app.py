@@ -1,9 +1,10 @@
 import streamlit as st
 
-st.header('st.selectbox')
+st.header('st.multiselect')
 
-option = st.selectbox(
-     'Apa hewan peliharaan yang anda miliki?',
-     ('Kucing', 'Anjing', 'Kelinci', 'Ayam'))
+options = st.multiselect(
+     'Apa hewan peliharaan yang anda miliki',
+     ['Kucing', 'Anjing', 'Kelinci', 'Ayam'],
+     ['Kucing', 'Anjing', 'Kelinci', 'Ayam'])
 
-st.write('Hewan peliharaan yang saya miliki adalah ', option)
+st.write('Hewan peliharaan yang saya miliki adalah ', options)
