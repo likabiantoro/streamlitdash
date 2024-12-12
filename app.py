@@ -24,13 +24,17 @@ if uploaded_file is not None:
     # Step 4: Kolom waktu harus diubah menjadi datetime
     if 'Date' in df.columns:
         df['Date'] = pd.to_datetime(df['Date'], errors='coerce')  # Mengubah menjadi datetime
-        
+        st.write("Data setelah konversi tanggal:", df.head())  # Debugging
+
         if df['Date'].isnull().any():
             st.error("Terdapat nilai yang tidak valid pada kolom 'Date'.")
         else:
             # Pilih kolom waktu dan nilai (misal: kolom 'Date' dan 'Value')
-            st.subheader('Visualisasi Data Time Series')
-            st.line_chart(df.set_index('Date')['Value'])
+            if 'Value' in df.columns:
+                st.subheader('Visualisasi Data Time Series')
+                st.line_chart(df.set_index('Date')['Value'])
+            else:
+                st.error("Kolom 'Value' tidak ditemukan pada dataset.")
 
             # Step 5: Pilih parameter ARIMA (p, d, q)
             st.header('2. Pilih Parameter ARIMA (p, d, q)')
@@ -41,6 +45,10 @@ if uploaded_file is not None:
             # Step 6: Memisahkan data menjadi data pelatihan dan data pengujian
             train_size = int(len(df) * 0.8)
             train, test = df['Value'][:train_size], df['Value'][train_size:]
+
+            # Debugging data train dan test
+            st.write("Data Pelatihan:", train.head())
+            st.write("Data Pengujian:", test.head())
 
             # Step 7: Membuat model ARIMA dan melakukan prediksi
             model = ARIMA(train, order=(p, d, q))
