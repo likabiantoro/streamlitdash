@@ -1,19 +1,44 @@
 import streamlit as st
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-st.title('st.session_state')
+# Set title for the app
+st.title('Dashboard Analisis Statistika Deskriptif')
 
-def meters_to_cm():
-    st.session_state.cm = st.session_state.meters * 100
+# Step 1: Upload CSV file
+st.header('1. Upload Data CSV')
+uploaded_file = st.file_uploader("Pilih file CSV", type="csv")
 
-def cm_to_meters():
-    st.session_state.meters = st.session_state.cm / 100
+if uploaded_file is not None:
+    # Step 2: Read and display the uploaded CSV
+    df = pd.read_csv(uploaded_file)
+    st.subheader('Tabel Data')
+    st.dataframe(df)
 
-st.header('Input')
-col1, spacer, col2 = st.columns([2, 1, 2])
-with col1:
-    meters = st.number_input("Meter:", key="meters", on_change=meters_to_cm)
-with col2:
-    cm = st.number_input("Sentimeter:", key="cm", on_change=cm_to_meters)
+    # Step 3: Display descriptive statistics
+    st.subheader('Statistik Deskriptif')
+    st.write(df.describe())
 
-st.header('Output')
-st.write("Objek st.session_state:", st.session_state)
+    # Step 4: Create Boxplot for each numeric column
+    st.subheader('Boxplot')
+    numeric_columns = df.select_dtypes(include=['float64', 'int64']).columns
+    if len(numeric_columns) > 0:
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.boxplot(data=df[numeric_columns], ax=ax)
+        st.pyplot(fig)
+    else:
+        st.write("Tidak ada kolom numerik untuk ditampilkan pada boxplot.")
+
+    # Step 5: Create Bar Chart for categorical data (if any)
+    st.subheader('Bar Chart')
+    categorical_columns = df.select_dtypes(include=['object', 'category']).columns
+    if len(categorical_columns) > 0:
+        for column in categorical_columns:
+            fig, ax = plt.subplots(figsize=(8, 6))
+            sns.countplot(data=df, x=column, ax=ax)
+            st.pyplot(fig)
+    else:
+        st.write("Tidak ada kolom kategorikal untuk ditampilkan pada bar chart.")
+else:
+    st.write("Silakan upload file CSV untuk analisis.")
