@@ -56,35 +56,20 @@ if uploaded_file is not None:
     cm = confusion_matrix(y_test, y_pred)
 
     # Menangani kasus dengan lebih dari dua kelas
-    if cm.shape == (2, 2):  # Jika klasifikasi biner
-        tn, fp, fn, tp = cm.ravel()  # tn: True Negative, fp: False Positive, fn: False Negative, tp: True Positive
+    tp = cm.diagonal().sum()  # Total True Positive (untuk semua kelas)
+    fn = cm.sum(axis=1) - cm.diagonal()  # Total False Negative
+    fp = cm.sum(axis=0) - cm.diagonal()  # Total False Positive
+    tn = cm.sum() - (tp + fn.sum() + fp.sum())  # Total True Negative
 
-        # Menghitung sensitivitas (recall) dan spesifisitas
-        sensitivity = (tp / (tp + fn)) * 100  # Sensitivitas dalam persen
-        specificity = (tn / (tn + fp)) * 100  # Spesifisitas dalam persen
-    else:
-        # Jika lebih dari dua kelas, sensitifitas dan spesifisitas per kelas
-        sensitivity = {}
-        specificity = {}
-        for i in range(cm.shape[0]):
-            tp = cm[i, i]  # True Positive per kelas
-            fn = cm[i, :].sum() - tp  # False Negative per kelas
-            fp = cm[:, i].sum() - tp  # False Positive per kelas
-            tn = cm.sum() - (tp + fp + fn)  # True Negative per kelas
-
-            sensitivity[i] = (tp / (tp + fn)) * 100 if (tp + fn) != 0 else 0  # Sensitivitas per kelas dalam persen
-            specificity[i] = (tn / (tn + fp)) * 100 if (tn + fp) != 0 else 0  # Spesifisitas per kelas dalam persen
+    # Menghitung sensitivitas dan spesifisitas keseluruhan
+    sensitivity = (tp / (tp + fn.sum())) * 100 if (tp + fn.sum()) > 0 else 0  # Sensitivitas total dalam persen
+    specificity = (tn / (tn + fp.sum())) * 100 if (tn + fp.sum()) > 0 else 0  # Spesifisitas total dalam persen
 
     # Step 9: Tampilkan hasil evaluasi
     st.subheader(f'Hasil Evaluasi Model')
-    st.write(f'Akurasi model: {accuracy:.2f}')
-    
-    if cm.shape == (2, 2):  # Jika klasifikasi biner
-        st.write(f'Sensitivitas (Recall): {sensitivity:.2f}%')
-        st.write(f'Spesifisitas: {specificity:.2f}%')
-    else:  # Jika lebih dari dua kelas
-        st.write(f'Sensitivitas per kelas: {sensitivity}')
-        st.write(f'Spesifisitas per kelas: {specificity}')
+    st.write(f'Akurasi model: {accuracy:.2f}%')
+    st.write(f'Sensitivitas keseluruhan: {sensitivity:.2f}%')
+    st.write(f'Spesifisitas keseluruhan: {specificity:.2f}%')
     
     # Step 10: Visualisasi pohon keputusan (optional)
     from sklearn.tree import plot_tree
