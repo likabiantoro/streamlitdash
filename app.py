@@ -9,4 +9,4 @@ st.subheader('Rumus Relativitas Einstein')
 st.latex(r'E = mc^2')
 
 st.subheader('Persamaan Gelombang')
-st.latex(r'\frac{\partial^2 u}{\partial t^2} = c^2 \nabla^2 u')
+st.latex(r'v = \lambda f')
