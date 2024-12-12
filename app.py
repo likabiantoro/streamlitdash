@@ -54,17 +54,37 @@ if uploaded_file is not None:
 
     # Confusion matrix untuk menghitung sensitivitas dan spesifisitas
     cm = confusion_matrix(y_test, y_pred)
-    tn, fp, fn, tp = cm.ravel()  # tn: True Negative, fp: False Positive, fn: False Negative, tp: True Positive
 
-    # Menghitung sensitivitas (recall) dan spesifisitas
-    sensitivity = tp / (tp + fn)
-    specificity = tn / (tn + fp)
+    # Menangani kasus dengan lebih dari dua kelas
+    if cm.shape == (2, 2):  # Jika klasifikasi biner
+        tn, fp, fn, tp = cm.ravel()  # tn: True Negative, fp: False Positive, fn: False Negative, tp: True Positive
+
+        # Menghitung sensitivitas (recall) dan spesifisitas
+        sensitivity = tp / (tp + fn)
+        specificity = tn / (tn + fp)
+    else:
+        # Jika lebih dari dua kelas, sensitifitas dan spesifisitas per kelas
+        sensitivity = {}
+        specificity = {}
+        for i in range(cm.shape[0]):
+            tp = cm[i, i]  # True Positive per kelas
+            fn = cm[i, :].sum() - tp  # False Negative per kelas
+            fp = cm[:, i].sum() - tp  # False Positive per kelas
+            tn = cm.sum() - (tp + fp + fn)  # True Negative per kelas
+
+            sensitivity[i] = tp / (tp + fn) if (tp + fn) != 0 else 0
+            specificity[i] = tn / (tn + fp) if (tn + fp) != 0 else 0
 
     # Step 9: Tampilkan hasil evaluasi
     st.subheader(f'Hasil Evaluasi Model')
     st.write(f'Akurasi model: {accuracy:.2f}')
-    st.write(f'Sensitivitas (Recall): {sensitivity:.2f}')
-    st.write(f'Spesifisitas: {specificity:.2f}')
+    
+    if cm.shape == (2, 2):  # Jika klasifikasi biner
+        st.write(f'Sensitivitas (Recall): {sensitivity:.2f}')
+        st.write(f'Spesifisitas: {specificity:.2f}')
+    else:  # Jika lebih dari dua kelas
+        st.write(f'Sensitivitas per kelas: {sensitivity}')
+        st.write(f'Spesifisitas per kelas: {specificity}')
     
     # Step 10: Visualisasi pohon keputusan (optional)
     from sklearn.tree import plot_tree
