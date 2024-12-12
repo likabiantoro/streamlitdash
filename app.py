@@ -14,7 +14,7 @@ with st.form('my_form'):
     minuman_val = st.selectbox('Pilih minuman', ['Es Teh', 'Es Jeruk', 'Air Putih', 'Kopi', 'Jus Mangga'])
     porsi_val = st.select_slider('Ukuran porsi', ['Kecil', 'Sedang', 'Besar'])
     pedas_val = st.select_slider('Tingkat kepedasan', ['Tidak Pedas', 'Sedikit Pedas', 'Pedas', 'Sangat Pedas'])
-    toping_val = st.checkbox('Telur','Sambal','Kerupuk')
+    toping_val = st.multiselect('Pilih toping', ['Telur', 'Sambal', 'Kerupuk'])
 
     # Setiap form harus memiliki tombol kirim
     submitted = st.form_submit_button('Kirim')
@@ -26,7 +26,7 @@ if submitted:
         - Minuman: `{minuman_val}`
         - Porsi: `{porsi_val}`
         - Kepedasan: `{pedas_val}`
-        - Toping: `{toping_val}`
+        - Toping: `{', '.join(toping_val)}`  # Menampilkan toping yang dipilih
         ''')
 else:
     st.write('☝️ Silakan pilih pesanan Anda!')
