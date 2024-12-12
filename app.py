@@ -1,42 +1,19 @@
 import streamlit as st
 
-st.title('st.form')
+st.title('st.session_state')
 
-# Contoh lengkap menggunakan notasi `with`
-st.header('1. Contoh penggunaan notasi `with`')
-st.subheader('Pesan Makanan')
+def meters_to_cm():
+    st.session_state.cm = st.session_state.meters * 100
 
-with st.form('my_form'):
-    st.subheader('**Pesan Makanan Anda**')
+def cm_to_meters():
+    st.session_state.meters = st.session_state.cm / 100
 
-    # Input widget
-    makanan_val = st.selectbox('Pilih makanan', ['Nasi Goreng', 'Sate', 'Rendang', 'Bakso', 'Gado-Gado'])
-    minuman_val = st.selectbox('Pilih minuman', ['Es Teh', 'Es Jeruk', 'Air Putih', 'Kopi', 'Jus Mangga'])
-    porsi_val = st.select_slider('Ukuran porsi', ['Kecil', 'Sedang', 'Besar'])
-    pedas_val = st.select_slider('Tingkat kepedasan', ['Tidak Pedas', 'Sedikit Pedas', 'Pedas', 'Sangat Pedas'])
-    toping_val = st.multiselect('Pilih toping', ['Telur', 'Sambal', 'Kerupuk'])
+st.header('Input')
+col1, spacer, col2 = st.columns([2, 1, 2])
+with col1:
+    meters = st.number_input("Meter:", key="meters", on_change=meters_to_cm)
+with col2:
+    cm = st.number_input("Sentimeter:", key="cm", on_change=cm_to_meters)
 
-    # Setiap form harus memiliki tombol kirim
-    submitted = st.form_submit_button('Kirim')
-
-if submitted:
-    st.markdown(f'''
-        🍽️ Anda telah memesan:
-        - Makanan: `{makanan_val}`
-        - Minuman: `{minuman_val}`
-        - Porsi: `{porsi_val}`
-        - Kepedasan: `{pedas_val}`
-        - Toping: `{', '.join(toping_val)}`  # Menampilkan toping yang dipilih
-        ''')
-else:
-    st.write('☝️ Silakan pilih pesanan Anda!')
-
-
-# Contoh singkat menggunakan notasi objek
-st.header('2. Contoh menggunakan notasi objek')
-
-form = st.form('my_form_2')
-selected_val = form.slider('Pilih nilai')
-form.form_submit_button('Kirim')
-
-st.write('Nilai yang dipilih: ', selected_val)
+st.header('Output')
+st.write("Objek st.session_state:", st.session_state)
