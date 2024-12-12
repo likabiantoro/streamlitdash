@@ -1,10 +1,9 @@
 import streamlit as st
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import LabelEncoder
 
 # Set title for the app
 st.title('Dashboard Klasifikasi dengan Decision Tree')
@@ -21,52 +20,43 @@ if uploaded_file is not None:
     st.subheader('Tabel Data')
     st.dataframe(df.head())
 
-    # Step 4: Menampilkan informasi tentang data
-    st.subheader('Informasi Data')
-    st.write(df.info())
+    # Cek jika ada nilai yang hilang dan mengisi dengan nilai rata-rata
+    if df.isnull().sum().any():
+        st.warning("Terdapat nilai yang hilang dalam data. Nilai yang hilang akan diisi dengan rata-rata.")
+        df = df.fillna(df.mean())
 
-    # Step 5: Menampilkan statistik deskriptif data
-    st.subheader('Statistik Deskriptif')
-    st.write(df.describe())
+    # Step 4: Encode target kolom jika diperlukan (misalnya 'Species' adalah string)
+    if df['Species'].dtype == 'object':  # Asumsi target kolom bernama 'Species'
+        le = LabelEncoder()
+        df['Species'] = le.fit_transform(df['Species'])
+    
+    # Step 5: Pisahkan data menjadi fitur (X) dan target (y)
+    X = df.drop(columns=['Species'])  # Fitur (X)
+    y = df['Species']  # Target (y)
 
-    # Step 6: Memilih fitur dan target untuk klasifikasi
-    st.header('2. Pilih Fitur dan Target')
-    target_column = st.selectbox('Pilih kolom target', df.columns)
-    feature_columns = st.multiselect('Pilih kolom fitur', df.columns, default=df.columns.tolist()[:-1])
+    # Step 6: Pisahkan data menjadi data pelatihan dan pengujian
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    if target_column and feature_columns:
-        # Step 7: Memisahkan data menjadi fitur dan target
-        X = df[feature_columns]
-        y = df[target_column]
+    # Step 7: Inisialisasi dan latih model Decision Tree
+    model = DecisionTreeClassifier()
+    model.fit(X_train, y_train)
 
-        # Step 8: Membagi data menjadi data pelatihan dan data pengujian
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Step 8: Prediksi dan evaluasi model
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
 
-        # Step 9: Membuat model Decision Tree
-        model = DecisionTreeClassifier(random_state=42)
-        model.fit(X_train, y_train)
+    # Step 9: Tampilkan hasil evaluasi
+    st.subheader(f'Hasil Evaluasi Model')
+    st.write(f'Akurasi model: {accuracy:.2f}')
+    
+    # Step 10: Visualisasi pohon keputusan (optional)
+    from sklearn.tree import plot_tree
+    import matplotlib.pyplot as plt
 
-        # Step 10: Prediksi dan evaluasi
-        y_pred = model.predict(X_test)
-        accuracy = accuracy_score(y_test, y_pred)
-
-        # Step 11: Menampilkan hasil evaluasi
-        st.subheader('Hasil Evaluasi Model')
-        st.write(f'Akurasi Model: {accuracy * 100:.2f}%')
-
-        # Menampilkan classification report
-        st.subheader('Classification Report')
-        st.text(classification_report(y_test, y_pred))
-
-        # Menampilkan confusion matrix
-        st.subheader('Confusion Matrix')
-        cm = confusion_matrix(y_test, y_pred)
-        fig, ax = plt.subplots(figsize=(6, 4))
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=model.classes_, yticklabels=model.classes_)
-        ax.set_xlabel('Prediksi')
-        ax.set_ylabel('Aktual')
-        ax.set_title('Confusion Matrix')
-        st.pyplot(fig)
+    st.subheader('Visualisasi Pohon Keputusan')
+    fig, ax = plt.subplots(figsize=(10, 8))
+    plot_tree(model, filled=True, feature_names=X.columns, class_names=le.classes_, ax=ax)
+    st.pyplot(fig)
 
 else:
-    st.write("Silakan upload file CSV yang berisi data untuk klasifikasi.")
+    st.write("Silakan upload file CSV yang berisi data dengan kolom 'Species' sebagai target.")
