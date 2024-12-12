@@ -21,16 +21,16 @@ with col1:
   if user_name != '':
     st.write(f'👋 Halo {user_name}!')
   else:
-    st.write('👈  Silakan masukkan **nama** Anda!')
+    st.write('👈  Silakan masukkan **nama** anda!')
 
 with col2:
   if user_emoji != '':
-    st.write(f'{user_emoji} Perasaan saya hari ini adalah **emoji**')
+    st.write(f'{user_emoji} Perasaan anda hari ini adalah **emoji**')
   else:
     st.write('👈 Silakan pilih **emoji**!')
 
 with col3:
   if user_food != '':
-    st.write(f'🍴 **{user_food}** adalah makanan **favorit** saya!')
+    st.write(f'🍴 **{user_food}** adalah makanan **favorit** anda !')
   else:
     st.write('👈 Silakan pilih makanan **favorit** Anda!')
