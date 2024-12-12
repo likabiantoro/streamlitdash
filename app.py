@@ -1,10 +1,18 @@
 import streamlit as st
 
-st.header('st.multiselect')
-# opsi yang dapat dipilih
-options = st.multiselect(
-     'Apa hewan peliharaan yang anda miliki',
-     ['Kucing', 'Anjing', 'Kelinci', 'Ayam'],
-     ['Kucing', 'Anjing']) # tampilan default
+st.header('st.checkbox')
 
-st.write('Hewan peliharaan yang saya miliki adalah ', options)
+st.write('Apa aktivitas yang Anda sukai?')
+
+membaca = st.checkbox('Membaca')
+bepergian = st.checkbox('Bepergian')
+bersepeda = st.checkbox('Bersepeda')
+
+if membaca:
+    st.write("Luar biasa! Membaca memperluas wawasan Anda 📚")
+
+if bepergian:
+    st.write("Hebat! Bepergian memperluas cakrawala Anda ✈️")
+
+if bersepeda:
+    st.write("Pilihan yang bagus! Bersepeda membuat Anda tetap sehat dan bugar 🚴")
