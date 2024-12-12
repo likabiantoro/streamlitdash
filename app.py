@@ -60,8 +60,8 @@ if uploaded_file is not None:
         tn, fp, fn, tp = cm.ravel()  # tn: True Negative, fp: False Positive, fn: False Negative, tp: True Positive
 
         # Menghitung sensitivitas (recall) dan spesifisitas
-        sensitivity = tp / (tp + fn)
-        specificity = tn / (tn + fp)
+        sensitivity = (tp / (tp + fn)) * 100  # Sensitivitas dalam persen
+        specificity = (tn / (tn + fp)) * 100  # Spesifisitas dalam persen
     else:
         # Jika lebih dari dua kelas, sensitifitas dan spesifisitas per kelas
         sensitivity = {}
@@ -72,16 +72,16 @@ if uploaded_file is not None:
             fp = cm[:, i].sum() - tp  # False Positive per kelas
             tn = cm.sum() - (tp + fp + fn)  # True Negative per kelas
 
-            sensitivity[i] = tp / (tp + fn) if (tp + fn) != 0 else 0
-            specificity[i] = tn / (tn + fp) if (tn + fp) != 0 else 0
+            sensitivity[i] = (tp / (tp + fn)) * 100 if (tp + fn) != 0 else 0  # Sensitivitas per kelas dalam persen
+            specificity[i] = (tn / (tn + fp)) * 100 if (tn + fp) != 0 else 0  # Spesifisitas per kelas dalam persen
 
     # Step 9: Tampilkan hasil evaluasi
     st.subheader(f'Hasil Evaluasi Model')
     st.write(f'Akurasi model: {accuracy:.2f}')
     
     if cm.shape == (2, 2):  # Jika klasifikasi biner
-        st.write(f'Sensitivitas (Recall): {sensitivity:.2f}')
-        st.write(f'Spesifisitas: {specificity:.2f}')
+        st.write(f'Sensitivitas (Recall): {sensitivity:.2f}%')
+        st.write(f'Spesifisitas: {specificity:.2f}%')
     else:  # Jika lebih dari dua kelas
         st.write(f'Sensitivitas per kelas: {sensitivity}')
         st.write(f'Spesifisitas per kelas: {specificity}')
